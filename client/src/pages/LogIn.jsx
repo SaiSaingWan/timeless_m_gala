@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 import { ArrowLeft, LogIn, KeyRound, UserCheck, Sparkles, Ticket } from 'lucide-react';
 
 export default function LogInPage() {
@@ -9,7 +11,8 @@ export default function LogInPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e) => {
+  // Validate credentials against Firebase Firestore
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -25,13 +28,35 @@ export default function LogInPage() {
 
     setLoading(true);
 
-    localStorage.setItem('studentId', studentId);
-    localStorage.setItem('studentName', 'MFU Student');
+    try {
+      const userRef = doc(db, 'users', studentId);
+      const userSnap = await getDoc(userRef);
 
-    setTimeout(() => {
+      if (!userSnap.exists()) {
+        setError('No account found with this Student ID. Please register first.');
+        setLoading(false);
+        return;
+      }
+
+      const userData = userSnap.data();
+
+      if (userData.passcode !== passcode) {
+        setError('Incorrect 6-digit passcode. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      // Store local session keys
+      localStorage.setItem('studentId', studentId);
+      localStorage.setItem('studentName', userData.fullName);
+
       setLoading(false);
       navigate('/dashboard');
-    }, 400);
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Failed to log in. Please check your network connection.');
+      setLoading(false);
+    }
   };
 
   return (
@@ -74,7 +99,6 @@ export default function LogInPage() {
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
-            
             {error && (
               <div className="bg-red-950/40 border border-red-500/40 text-red-200 text-xs p-3 rounded-xl text-center font-medium">
                 {error}
@@ -96,7 +120,7 @@ export default function LogInPage() {
                   placeholder="e.g. 6731503084"
                   value={studentId}
                   onChange={(e) => setStudentId(e.target.value)}
-                  className="w-full bg-[#1d1d20]/80 border border-zinc-800 rounded-xl py-3 pl-10 pr-4 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-400 transition-all"
+                  className="w-full bg-[#1d1d20]/80 border border-zinc-800 rounded-xl py-3 pl-10 pr-4 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-400 transition-all font-mono"
                 />
               </div>
             </div>
@@ -117,7 +141,7 @@ export default function LogInPage() {
                   placeholder="••••••"
                   value={passcode}
                   onChange={(e) => setPasscode(e.target.value)}
-                  className="w-full bg-[#1d1d20]/80 border border-zinc-800 rounded-xl py-3 pl-10 pr-4 text-sm tracking-widest text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-400 transition-all"
+                  className="w-full bg-[#1d1d20]/80 border border-zinc-800 rounded-xl py-3 pl-10 pr-4 text-sm tracking-widest text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-400 transition-all font-mono"
                 />
               </div>
             </div>
@@ -146,7 +170,7 @@ export default function LogInPage() {
               className="w-full py-2.5 rounded-xl bg-[#1d1d20] border border-amber-500/30 text-amber-300 text-xs font-semibold flex items-center justify-center gap-2 hover:bg-[#27272a] transition-all cursor-pointer"
             >
               <Ticket className="w-3.5 h-3.5 text-amber-400" />
-              Buy Ticket Pass (89 THB)
+              Buy Ticket Pass (39 THB)
             </button>
           </div>
 

@@ -1,61 +1,97 @@
 import { useState } from 'react';
-import { CheckCircle2, Vote, Info, X } from 'lucide-react';
+import { CheckCircle2, Vote, Info, X, User } from 'lucide-react';
 
-const candidatesList = [
+const maleCandidates = [
   {
-    id: 101,
-    name: 'Ethan & Sophia',
-    number: 'Candidate #01',
+    id: 'm1',
+    gender: 'male',
+    name: 'Ethan Roberts',
+    number: 'Male #01',
     faculty: 'School of Information Technology',
-    motto: 'Leadership through innovation and elegance.',
-    bio: 'Representing IT, Ethan and Sophia have spearheaded community tech initiatives and student cultural events for two consecutive years.',
-    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 102,
-    name: 'Lucas & Maya',
-    number: 'Candidate #02',
-    faculty: 'School of Management',
-    motto: 'Empowering student voices through creative arts.',
-    bio: 'Representing Management, Lucas and Maya are passionate advocates for cross-cultural collaboration and university performance art initiatives.',
+    motto: 'Innovation through technology and elegance.',
+    bio: 'Ethan has spearheaded IT community initiatives and organized tech workshops across MFU for two consecutive years.',
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80'
   },
   {
-    id: 103,
-    name: 'Daniel & Chloe',
-    number: 'Candidate #03',
+    id: 'm2',
+    gender: 'male',
+    name: 'Lucas Vance',
+    number: 'Male #02',
+    faculty: 'School of Management',
+    motto: 'Leadership with vision and purpose.',
+    bio: 'Lucas is a student council representative passionate about business strategy, public speaking, and youth empowerment.',
+    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80'
+  }
+];
+
+const femaleCandidates = [
+  {
+    id: 'f1',
+    gender: 'female',
+    name: 'Sophia Chen',
+    number: 'Female #01',
     faculty: 'School of Liberal Arts',
-    motto: 'Preserving heritage, inspiring future generations.',
-    bio: 'Representing Liberal Arts, Daniel and Chloe bring a wealth of background in traditional stage acting, debate, and international ambassador programs.',
+    motto: 'Preserving culture while inspiring future generations.',
+    bio: 'Sophia excels in classical dance performance and debate. She represents MFU in international cultural exchange programs.',
+    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80'
+  },
+  {
+    id: 'f2',
+    gender: 'female',
+    name: 'Maya Lin',
+    number: 'Female #02',
+    faculty: 'School of Cosmetic Science',
+    motto: 'Grace, confidence, and creative expression.',
+    bio: 'Maya is active in campus theatre and health science research, advocating for wellness and creative student initiatives.',
     image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80'
   }
 ];
 
-export default function AmbassadorsTab({ votedCandidateId, onVote }) {
+export default function AmbassadorsTab({ votedMaleId, votedFemaleId, onVote }) {
+  const [activeCategory, setActiveCategory] = useState('male'); // 'male' or 'female'
   const [selectedCandidate, setSelectedCandidate] = useState(null);
+
+  const currentList = activeCategory === 'male' ? maleCandidates : femaleCandidates;
+  const currentVotedId = activeCategory === 'male' ? votedMaleId : votedFemaleId;
 
   return (
     <div className="space-y-4">
       <div>
         <h1 className="text-lg font-bold text-zinc-100">Vote Ambassador 2026</h1>
-        <p className="text-xs text-zinc-400">1 ticket pass = 1 live ambassador vote.</p>
+        <p className="text-xs text-zinc-400">Cast 1 vote for Male Ambassador and 1 vote for Female Ambassador.</p>
       </div>
 
-      {votedCandidateId && (
-        <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 flex items-center gap-2.5 text-amber-200 text-xs">
-          <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
-          <div>
-            <span className="font-bold">Vote Submitted!</span> You voted for{' '}
-            <span className="underline font-semibold text-amber-300">
-              {candidatesList.find(c => c.id === votedCandidateId)?.name}
-            </span>
-          </div>
-        </div>
-      )}
+      {/* Category Toggle Tabs */}
+      <div className="grid grid-cols-2 gap-2 bg-[#1d1d20] p-1.5 rounded-xl border border-zinc-800">
+        <button
+          onClick={() => setActiveCategory('male')}
+          className={`py-2 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+            activeCategory === 'male'
+              ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-zinc-950 shadow-md'
+              : 'text-zinc-400 hover:text-zinc-200'
+          }`}
+        >
+          <User className="w-3.5 h-3.5" /> Male Candidates
+          {votedMaleId && <CheckCircle2 className="w-3.5 h-3.5 text-zinc-950" />}
+        </button>
 
+        <button
+          onClick={() => setActiveCategory('female')}
+          className={`py-2 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+            activeCategory === 'female'
+              ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-zinc-950 shadow-md'
+              : 'text-zinc-400 hover:text-zinc-200'
+          }`}
+        >
+          <User className="w-3.5 h-3.5" /> Female Candidates
+          {votedFemaleId && <CheckCircle2 className="w-3.5 h-3.5 text-zinc-950" />}
+        </button>
+      </div>
+
+      {/* Candidate List */}
       <div className="space-y-4">
-        {candidatesList.map((cand) => {
-          const isVoted = votedCandidateId === cand.id;
+        {currentList.map((cand) => {
+          const isVoted = currentVotedId === cand.id;
           return (
             <div
               key={cand.id}
@@ -83,11 +119,11 @@ export default function AmbassadorsTab({ votedCandidateId, onVote }) {
                     onClick={() => setSelectedCandidate(cand)}
                     className="flex-1 py-2.5 rounded-xl bg-[#0f0f10] border border-zinc-800 text-zinc-300 text-xs font-semibold hover:bg-[#27272a] hover:border-amber-500/30 transition-all cursor-pointer flex items-center justify-center gap-1.5"
                   >
-                    <Info className="w-3.5 h-3.5 text-amber-400" /> Bio Modal
+                    <Info className="w-3.5 h-3.5 text-amber-400" /> Bio
                   </button>
 
                   <button
-                    onClick={() => onVote(cand.id)}
+                    onClick={() => onVote(cand.category, cand.id)}
                     className={`flex-1 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                       isVoted 
                         ? 'bg-amber-400 text-zinc-950 font-black shadow-lg shadow-amber-400/20' 
@@ -97,7 +133,7 @@ export default function AmbassadorsTab({ votedCandidateId, onVote }) {
                     {isVoted ? (
                       <><CheckCircle2 className="w-4 h-4 text-zinc-950" /> Voted</>
                     ) : (
-                      <><Vote className="w-4 h-4 text-zinc-950" /> Cast Vote</>
+                      <><Vote className="w-4 h-4 text-zinc-950" /> Vote {cand.gender === 'male' ? 'Male' : 'Female'}</>
                     )}
                   </button>
                 </div>
@@ -107,7 +143,7 @@ export default function AmbassadorsTab({ votedCandidateId, onVote }) {
         })}
       </div>
 
-      {/* Modal */}
+      {/* Candidate Modal */}
       {selectedCandidate && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-5">
           <div className="bg-[#0f0f10] border border-amber-500/30 w-full max-w-sm rounded-2xl p-5 relative shadow-2xl space-y-4">
@@ -133,7 +169,7 @@ export default function AmbassadorsTab({ votedCandidateId, onVote }) {
 
             <button
               onClick={() => {
-                onVote(selectedCandidate.id);
+                onVote(selectedCandidate.gender, selectedCandidate.id);
                 setSelectedCandidate(null);
               }}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-300 text-zinc-950 font-black text-xs flex items-center justify-center gap-2 hover:brightness-110 cursor-pointer shadow-lg shadow-amber-500/15"

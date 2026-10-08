@@ -99,7 +99,7 @@ export default function LandingPage() {
               className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-300 text-zinc-950 font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/15 hover:brightness-110 transition-all cursor-pointer"
             >
               <Ticket className="w-4 h-4" />
-              Buy Ticket Pass (89 THB)
+              Buy Ticket Pass (39 THB)
             </button>
 
             <button
