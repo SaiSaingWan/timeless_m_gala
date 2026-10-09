@@ -43,7 +43,7 @@ export default function TicketTab({ studentId, studentName, paymentStatus = 'pen
         {/* Faded Poster Background Layer */}
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-15 pointer-events-none mix-blend-luminosity scale-105"
-          style={{ backgroundImage: `url('/poster.png')` }}
+          style={{ backgroundImage: `url('/poster.webp')` }}
         />
         
         {/* Dark Vignette Overlay for readability */}

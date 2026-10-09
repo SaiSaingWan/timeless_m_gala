@@ -193,7 +193,7 @@ export default function BuyTicket() {
                   inputMode="numeric"
                   maxLength={10}
                   required
-                  placeholder="e.g. 6731503084"
+                  placeholder="e.g. 6712345678"
                   value={studentId}
                   onChange={(e) => setStudentId(e.target.value)}
                   className="w-full bg-[#1d1d20]/80 border border-zinc-800 rounded-xl py-2.5 pl-10 pr-4 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-400 transition-all font-mono"
@@ -346,8 +346,10 @@ export default function BuyTicket() {
             <div className="bg-[#1d1d20] p-4 rounded-xl border border-zinc-800 text-center space-y-3">
               <div className="bg-white p-3 rounded-xl inline-block shadow-lg border-2 border-amber-400/20">
                 <img
-                  src="/qrpay.png"
+                  src="/qrpay.webp"
                   alt="PromptPay QR Code"
+                  loading="lazy"
+                  decoding="async"
                   className="w-44 h-auto max-h-56 object-contain rounded-lg mx-auto"
                 />
               </div>

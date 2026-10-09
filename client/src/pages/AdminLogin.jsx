@@ -96,7 +96,7 @@ export default function AdminLogin() {
                 inputMode="numeric"
                 maxLength={10}
                 required
-                placeholder="e.g. 6731503084"
+                placeholder="e.g. 6712345678"
                 value={studentId}
                 onChange={(e) => setStudentId(e.target.value)}
                 className="w-full bg-[#1d1d20] border border-zinc-800 rounded-xl py-2.5 pl-10 pr-4 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-amber-400 transition-all font-mono"

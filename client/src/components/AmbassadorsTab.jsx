@@ -10,7 +10,7 @@ const maleCandidates = [
     faculty: 'School of Management',
     motto: 'ဟောဒီ...ရှေ့ဆက်ရဲတဲ့ ခြေလှမ်းတွေဟာ ပြည့်စုံကျွမ်းကျင်မှု နဲ့ မဟုတ်။ စိတ်အားထက်သန်မှုနဲ့သာဖြစ်တယ်။',
     bio: 'Ethan has spearheaded IT community initiatives and organized tech workshops across MFU for two consecutive years.',
-    image: '/males/3.png'
+    image: '/males/3.webp'
   },
   {
     id: 'm2',
@@ -20,7 +20,7 @@ const maleCandidates = [
     faculty: 'School of Applied Digital Technology',
     motto: 'အတားအဆီးမဲ့',
     bio: 'Lucas is a student council representative passionate about business strategy, public speaking, and youth empowerment.',
-    image: '/males/4.png'
+    image: '/males/4.webp'
   },
   {
     id: 'm3',
@@ -30,7 +30,7 @@ const maleCandidates = [
     faculty: 'School of Health Science',
     motto: 'သင့်ရဲ့ စွမ်းဆောင်ရည်တွေဟာ အကန့်အသတ်မရှိပါဘူး။ သင်တကယ်ဖြစ်ချင်တဲ့ အရာကိုပဲ ရအောင်လုပ်ဆောင်ပါ။',
     bio: 'Daniel leads campus wellness drives and student athletics associations.',
-    image: '/males/5.png'
+    image: '/males/5.webp'
   },
   {
     id: 'm4',
@@ -40,7 +40,7 @@ const maleCandidates = [
     faculty: 'School of Management',
     motto: 'ကိုယ့်ဘဝကို ကိုယ်တိုင်ရေးဆွဲရတဲ့အတွက် ရွေးချယ်မှုတိုင်းကို ဂုဏ်ယူနိုင်အောင် ရွေးချယ်မယ်',
     bio: 'Julian is an advocate for creative writing and global student exchange programs.',
-    image: '/males/10.png'
+    image: '/males/10.webp'
   },
   {
     id: 'm5',
@@ -50,7 +50,7 @@ const maleCandidates = [
     faculty: 'School of Applied Digital Technology',
     motto: 'Freshersများကို representပေးပြီး ပျော်ရွှင်စရာကောင်းတဲ့ University life ရအောင်ကြိုးစားသွားမယ်ဗျ။',
     bio: 'Alexander works on student research projects in environmental sustainability.',
-    image: '/males/13.png'
+    image: '/males/13.webp'
   },
   {
     id: 'm6',
@@ -60,7 +60,7 @@ const maleCandidates = [
     faculty: 'School of Management',
     motto: 'ခက်ခဲနေပါစေ အားလုံးအတူရင်ဆိုင်သွားမှာမို့ ကျွန်တော်တို့ဆက်ပြီး ရှင်သန်သွားပေးပါ',
     bio: 'Marcus represents MFU in national mock trial competitions.',
-    image: '/males/14.png'
+    image: '/males/14.webp'
   },
   {
     id: 'm7',
@@ -70,7 +70,7 @@ const maleCandidates = [
     faculty: 'School of Applied Digital Technology',
     motto: 'Macha ချစ်သူ၊ မနက်ပိုင်းအတန်းမုန်းသူ',
     bio: 'Gabriel organizes rural health outreach programs in Chiang Rai.',
-    image: '/males/15.png'
+    image: '/males/15.webp'
   }
 ];
 
@@ -83,7 +83,7 @@ const femaleCandidates = [
     faculty: 'School of Liberal Arts',
     motto: 'တခြားလူတွေရဲ့ရင်ထဲကခံစားချက်တွေကိုနားထောင်ပေးပြီး သူတို့နဲ့စကားတွေပြောနေရရင်ကိုပျော်တယ်',
     bio: 'Sophia excels in classical dance performance and debate. She represents MFU in international cultural exchange programs.',
-    image: '/females/1.png'
+    image: '/females/1.webp'
   },
   {
     id: 'f2',
@@ -93,7 +93,7 @@ const femaleCandidates = [
     faculty: 'School of Liberal Arts',
     motto: 'နှေးနိုင်ပေမယ့် မရပ်လိုက်နဲ့။',
     bio: 'Maya is active in campus theatre and health science research, advocating for wellness and creative student initiatives.',
-    image: '/females/2.png'
+    image: '/females/2.webp'
   },
   {
     id: 'f3',
@@ -103,7 +103,7 @@ const femaleCandidates = [
     faculty: 'School of Science',
     motto: 'ငှက်တစ်သောင်းနားခိုနိုင်တဲ့သစ်ပင်ဖြစ်ပါ၊ သို့သော် ကြီးထွားဆဲအပင်ငယ်လေးတွေပေါ်မှာ ကိုယ့်ရဲ့လောင်းရိပ်ကင်းပါစေ။',
     bio: 'Elena is president of the Student Business Society and founder of youth startup forums.',
-    image: '/females/6.png'
+    image: '/females/6.webp'
   },
   {
     id: 'f4',
@@ -113,7 +113,7 @@ const femaleCandidates = [
     faculty: 'School of Applied Digital Technology',
     motto: 'ဘဝမှာ ပြီးပြည့်စုံဖို့ထက် နေ့တိုင်းပိုကောင်းလာဖို့ကိုပဲရွေးချယ်မယ်...လမ်းပျောက်ရင်တောင် ကိုယ့်အိပ်မက်ကို မမေ့ဘူး..',
     bio: 'Chloe leads women-in-tech workshops and mobile app hackathons.',
-    image: '/females/7.png'
+    image: '/females/7.webp'
   },
   {
     id: 'f5',
@@ -123,7 +123,7 @@ const femaleCandidates = [
     faculty: 'School of Cosmetic Science',
     motto: 'အပြုံးနဲ့ကြို၊ မေတ္တာနဲ့ပျိုး၊ ရိုးသားစွာနေ၊ ကောင်းခြင်းနဲ့သာရှင်သန်သွားမည်။',
     bio: 'Aria volunteers at local community clinics and student wellness fairs.',
-    image: '/females/8.png'
+    image: '/females/8.webp'
   },
   {
     id: 'f6',
@@ -133,7 +133,7 @@ const femaleCandidates = [
     faculty: 'School of Liberal Arts',
     motto: 'အဆိုးအားဖြင့် အရှုံးမခံနှင့်။ အကောင်းအားဖြင့် အဆိုးကို နိုင်လော့။ ရောမ ၁၂:၂၁',
     bio: 'Isabella coordinates international language forums and cultural galas.',
-    image: '/females/9.png'
+    image: '/females/9.webp'
   },
   {
     id: 'f7',
@@ -143,7 +143,7 @@ const femaleCandidates = [
     faculty: 'School of Health Science',
     motto: 'ဖြစ်ချင်တာဖြစ်ဖို့ သတ္တိတွေအများကြီးမလိုဘူး။ စလုပ်ဖို့ပဲလိုတယ်။',
     bio: 'Hannah researches sustainable food processing and eco-friendly packaging.',
-    image: '/females/11.png'
+    image: '/females/11.webp'
   },
   {
     id: 'f8',
@@ -153,7 +153,7 @@ const femaleCandidates = [
     faculty: 'School of Social Innovation',
     motto: 'ယုံကြည်မှု၊ အကျင့်စာရိတ္တ၊ လူသားဆန်မှု',
     bio: 'Victoria promotes mental health awareness and holistic wellness campaigns.',
-    image: '/females/12.png'
+    image: '/females/12.webp'
   }
 ];
 
@@ -250,6 +250,8 @@ export default function AmbassadorsTab({
                 <img 
                   src={cand.image} 
                   alt={cand.name} 
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover object-center" 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1d1d20] via-transparent to-transparent opacity-80" />
@@ -317,6 +319,8 @@ export default function AmbassadorsTab({
                 <img 
                   src={selectedCandidate.image} 
                   alt={selectedCandidate.name} 
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover" 
                 />
               </div>

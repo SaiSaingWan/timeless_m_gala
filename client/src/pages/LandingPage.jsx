@@ -64,7 +64,7 @@ export default function LandingPage() {
         <section className="px-5 pt-6 pb-4 text-center space-y-4">
           <div className="relative rounded-2xl overflow-hidden border border-amber-500/30 shadow-2xl group">
             <img 
-              src="/poster.png" 
+              src="/poster.webp" 
               alt="The Timeless M-Gala Poster" 
               className="w-full object-cover group-hover:scale-105 transition-transform duration-700"
             />
