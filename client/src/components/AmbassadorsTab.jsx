@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle2, Vote, Info, X, User, Lock } from 'lucide-react';
+import { CheckCircle2, Vote, Info, X, User, Lock, Clock, ShieldAlert } from 'lucide-react';
 
 const maleCandidates = [
   {
@@ -151,38 +151,58 @@ const femaleCandidates = [
     name: 'Hsu Yi Htwe',
     number: 'Female #08',
     faculty: 'School of Social Innovation',
-    motto: 'Holistic wellness for all.',
+    motto: 'ယုံကြည်မှု၊ အကျင့်စာရိတ္တ၊ လူသားဆန်မှု',
     bio: 'Victoria promotes mental health awareness and holistic wellness campaigns.',
     image: '/females/12.png'
   }
 ];
 
-export default function AmbassadorsTab({ votedMaleId, votedFemaleId, onVote, votingFrozen = false }) {
+export default function AmbassadorsTab({ 
+  votedMaleId, 
+  votedFemaleId, 
+  onVote, 
+  votingFrozen = false,
+  paymentStatus = 'pending' 
+}) {
   const [activeCategory, setActiveCategory] = useState('male');
   const [selectedCandidate, setSelectedCandidate] = useState(null);
+
+  const isApproved = paymentStatus === 'approved';
+  const canVote = isApproved && !votingFrozen;
 
   const currentList = activeCategory === 'male' ? maleCandidates : femaleCandidates;
   const currentVotedId = activeCategory === 'male' ? votedMaleId : votedFemaleId;
 
   return (
     <div className="space-y-4">
+      {/* Title & Lock Status */}
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-lg font-bold text-zinc-100">Vote Ambassador 2026</h1>
           <p className="text-xs text-zinc-400">Cast 1 vote for Male Ambassador and 1 vote for Female Ambassador.</p>
         </div>
 
-        {votingFrozen && (
-          <span className="bg-red-500/10 text-red-400 border border-red-500/30 text-[10px] font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1">
+        {votingFrozen ? (
+          <span className="bg-red-500/10 text-red-400 border border-red-500/30 text-[10px] font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1 shrink-0">
             <Lock className="w-3 h-3 text-red-400" /> Voting Closed
+          </span>
+        ) : !isApproved && (
+          <span className="bg-amber-500/10 text-amber-300 border border-amber-500/30 text-[10px] font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1 shrink-0">
+            <Clock className="w-3 h-3 text-amber-400" /> Pass Pending
           </span>
         )}
       </div>
 
-      {votingFrozen && (
+      {/* Warning Banners */}
+      {votingFrozen ? (
         <div className="bg-red-950/40 border border-red-500/40 text-red-200 text-xs p-3 rounded-xl text-center font-medium flex items-center justify-center gap-2">
           <Lock className="w-4 h-4 text-red-400 shrink-0" />
           <span>Voting has been officially frozen by the Gala Committee.</span>
+        </div>
+      ) : !isApproved && (
+        <div className="bg-amber-950/40 border border-amber-500/40 text-amber-200 text-xs p-3 rounded-xl text-center font-medium flex items-center justify-center gap-2">
+          <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
+          <span>Voting unlocks once your payment slip (39 THB) is approved by admin.</span>
         </div>
       )}
 
@@ -197,7 +217,7 @@ export default function AmbassadorsTab({ votedMaleId, votedFemaleId, onVote, vot
           }`}
         >
           <User className="w-3.5 h-3.5" /> Male Candidates
-          {votedMaleId && <CheckCircle2 className="w-3.5 h-3.5 text-zinc-950" />}
+          {votedMaleId && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
         </button>
 
         <button
@@ -209,7 +229,7 @@ export default function AmbassadorsTab({ votedMaleId, votedFemaleId, onVote, vot
           }`}
         >
           <User className="w-3.5 h-3.5" /> Female Candidates
-          {votedFemaleId && <CheckCircle2 className="w-3.5 h-3.5 text-zinc-950" />}
+          {votedFemaleId && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
         </button>
       </div>
 
@@ -221,7 +241,9 @@ export default function AmbassadorsTab({ votedMaleId, votedFemaleId, onVote, vot
             <div
               key={cand.id}
               className={`bg-[#1d1d20]/90 border rounded-2xl overflow-hidden shadow-xl transition-all ${
-                isVoted ? 'border-amber-400 ring-2 ring-amber-400/20' : 'border-zinc-800/80 hover:border-amber-500/40'
+                isVoted 
+                  ? 'border-emerald-500 ring-2 ring-emerald-500/30' 
+                  : 'border-zinc-800/80 hover:border-amber-500/40'
               }`}
             >
               <div className="relative aspect-square w-full overflow-hidden bg-zinc-900">
@@ -240,7 +262,7 @@ export default function AmbassadorsTab({ votedMaleId, votedFemaleId, onVote, vot
                 <div>
                   <h2 className="text-base font-extrabold text-zinc-100">{cand.name}</h2>
                   <p className="text-xs text-amber-300 font-medium">{cand.faculty}</p>
-                  <p className="text-[11px] text-zinc-300 italic mt-1 font-serif">"{cand.motto}"</p>
+                  <p className="text-[11px] text-zinc-300 italic mt-1 font-serif leading-relaxed">"{cand.motto}"</p>
                 </div>
 
                 <div className="pt-2 flex gap-2">
@@ -252,18 +274,20 @@ export default function AmbassadorsTab({ votedMaleId, votedFemaleId, onVote, vot
                   </button>
 
                   <button
-                    disabled={votingFrozen}
-                    onClick={() => !votingFrozen && onVote(cand.gender, cand.id)}
+                    disabled={!canVote}
+                    onClick={() => canVote && onVote(cand.gender, cand.id)}
                     className={`flex-1 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
-                      votingFrozen
+                      !canVote
                         ? 'bg-zinc-800 text-zinc-500 border border-zinc-700/60 cursor-not-allowed opacity-60'
                         : isVoted 
-                        ? 'bg-amber-400 text-zinc-950 font-black shadow-lg shadow-amber-400/20 cursor-pointer' 
+                        ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 text-zinc-950 font-black shadow-lg shadow-emerald-500/25 border border-emerald-300/40 cursor-pointer' 
                         : 'bg-gradient-to-r from-amber-500 via-amber-400 to-amber-300 text-zinc-950 hover:brightness-110 cursor-pointer'
                     }`}
                   >
                     {votingFrozen ? (
                       <><Lock className="w-3.5 h-3.5 text-zinc-500" /> Voting Closed</>
+                    ) : !isApproved ? (
+                      <><Clock className="w-3.5 h-3.5 text-zinc-500" /> Pass Unverified</>
                     ) : isVoted ? (
                       <><CheckCircle2 className="w-4 h-4 text-zinc-950" /> Voted</>
                     ) : (
@@ -309,21 +333,27 @@ export default function AmbassadorsTab({ votedMaleId, votedFemaleId, onVote, vot
             </div>
 
             <button
-              disabled={votingFrozen}
+              disabled={!canVote}
               onClick={() => {
-                if (!votingFrozen) {
+                if (canVote) {
                   onVote(selectedCandidate.gender, selectedCandidate.id);
                   setSelectedCandidate(null);
                 }
               }}
               className={`w-full py-3 rounded-xl font-black text-xs flex items-center justify-center gap-2 transition-all ${
-                votingFrozen
+                !canVote
                   ? 'bg-zinc-800 text-zinc-500 border border-zinc-700/60 cursor-not-allowed opacity-60'
+                  : currentVotedId === selectedCandidate.id
+                  ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 text-zinc-950 font-black shadow-lg shadow-emerald-500/25 border border-emerald-300/40 cursor-pointer'
                   : 'bg-gradient-to-r from-amber-500 via-amber-400 to-amber-300 text-zinc-950 hover:brightness-110 cursor-pointer shadow-lg shadow-amber-500/15'
               }`}
             >
               {votingFrozen ? (
                 <><Lock className="w-4 h-4 text-zinc-500" /> Voting Closed</>
+              ) : !isApproved ? (
+                <><Clock className="w-4 h-4 text-zinc-500" /> Pass Unverified</>
+              ) : currentVotedId === selectedCandidate.id ? (
+                <><CheckCircle2 className="w-4 h-4 text-zinc-950" /> Voted</>
               ) : (
                 <><Vote className="w-4 h-4" /> Vote For {selectedCandidate.name}</>
               )}

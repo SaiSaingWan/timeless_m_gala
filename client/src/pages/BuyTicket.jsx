@@ -344,17 +344,21 @@ export default function BuyTicket() {
 
             {/* PromptPay QR Section */}
             <div className="bg-[#1d1d20] p-4 rounded-xl border border-zinc-800 text-center space-y-3">
-              <div className="bg-white p-3 rounded-lg inline-block shadow-lg">
+              <div className="bg-white p-3 rounded-xl inline-block shadow-lg border-2 border-amber-400/20">
                 <img
-                  src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=PROMPTPAY-0812345678-39"
+                  src="/qrpay.png"
                   alt="PromptPay QR Code"
-                  className="w-36 h-36"
+                  className="w-44 h-auto max-h-56 object-contain rounded-lg mx-auto"
                 />
               </div>
-              <div className="text-xs space-y-0.5">
-                <p className="font-bold text-amber-300">Mae Fah Luang Student Gala Account</p>
-                <p className="text-[11px] text-zinc-400 font-mono">PromptPay ID: 081-234-5678</p>
-                <p className="text-sm font-extrabold text-zinc-100 pt-1">Amount: 39.00 THB</p>
+              <div className="text-xs space-y-1">
+                <p className="font-extrabold text-amber-300 tracking-wide uppercase">
+                  MISS HANNAH BAWI NUN THIANG
+                </p>
+                <p className="text-[11px] text-zinc-300 font-mono">
+                  PromptPay / Mobile: <span className="font-bold text-amber-400">081-xxx-3302</span>
+                </p>
+                <p className="text-sm font-extrabold text-zinc-100 pt-0.5">Amount: 39.00 THB</p>
               </div>
             </div>
 

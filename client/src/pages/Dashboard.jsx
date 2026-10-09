@@ -55,7 +55,7 @@ export default function Dashboard() {
 
   // Dual-Category Vote Handler (Male / Female)
   const handleVote = async (category, candidateId) => {
-    if (!studentId || votingFrozen) return;
+    if (!studentId || votingFrozen || userData?.paymentStatus !== 'approved') return;
 
     const updateField = category === 'male' ? { votedMaleId: candidateId } : { votedFemaleId: candidateId };
 
@@ -95,6 +95,7 @@ export default function Dashboard() {
               votedFemaleId={userData?.votedFemaleId || null} 
               onVote={handleVote} 
               votingFrozen={votingFrozen}
+              paymentStatus={userData?.paymentStatus || 'pending'}
             />
           )}
 
