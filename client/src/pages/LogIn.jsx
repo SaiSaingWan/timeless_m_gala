@@ -117,7 +117,7 @@ export default function LogInPage() {
                   inputMode="numeric"
                   maxLength={10}
                   required
-                  placeholder="e.g. 6731503084"
+                  placeholder="e.g. 6712345678"
                   value={studentId}
                   onChange={(e) => setStudentId(e.target.value)}
                   className="w-full bg-[#1d1d20]/80 border border-zinc-800 rounded-xl py-3 pl-10 pr-4 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-400 transition-all font-mono"
@@ -156,7 +156,7 @@ export default function LogInPage() {
               ) : (
                 <>
                   <LogIn className="w-4 h-4" />
-                  Log In to Student Portal
+                  Log In
                 </>
               )}
             </button>

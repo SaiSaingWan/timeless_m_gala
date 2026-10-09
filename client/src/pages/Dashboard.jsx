@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
@@ -13,11 +13,10 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('ticket');
   const [studentId, setStudentId] = useState('');
   const [userData, setUserData] = useState(null);
-  const [votedCandidateId, setVotedCandidateId] = useState(null);
+  const [votingFrozen, setVotingFrozen] = useState(false);
 
   useEffect(() => {
     const savedId = localStorage.getItem('studentId');
-    const savedVote = localStorage.getItem('votedCandidateId');
 
     if (!savedId) {
       navigate('/login');
@@ -25,33 +24,51 @@ export default function Dashboard() {
     }
 
     setStudentId(savedId);
-    if (savedVote) setVotedCandidateId(Number(savedVote));
 
-    // Listen to real-time updates from Firestore 'users' collection
-    const unsub = onSnapshot(doc(db, 'users', savedId), (docSnap) => {
+    // 1. Listen for current user document
+    const unsubUser = onSnapshot(doc(db, 'users', savedId), (docSnap) => {
       if (docSnap.exists()) {
         setUserData(docSnap.data());
       } else {
-        // Fallback to local storage if document hasn't synced yet
         const localUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
         setUserData(localUser);
       }
     });
 
-    return () => unsub();
+    // 2. Listen for global voting freeze setting from Firestore
+    const unsubConfig = onSnapshot(doc(db, 'settings', 'eventConfig'), (configSnap) => {
+      if (configSnap.exists()) {
+        setVotingFrozen(configSnap.data().votingFrozen || false);
+      }
+    });
+
+    return () => {
+      unsubUser();
+      unsubConfig();
+    };
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('studentId');
-    localStorage.removeItem('studentName');
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('votedCandidateId');
+    localStorage.clear();
     navigate('/login');
   };
 
-  const handleVote = (candidateId) => {
-    setVotedCandidateId(candidateId);
-    localStorage.setItem('votedCandidateId', candidateId);
+  // Dual-Category Vote Handler (Male / Female)
+  const handleVote = async (category, candidateId) => {
+    if (!studentId || votingFrozen) return;
+
+    const updateField = category === 'male' ? { votedMaleId: candidateId } : { votedFemaleId: candidateId };
+
+    // Update local state immediately for fast feedback
+    setUserData((prev) => ({ ...prev, ...updateField }));
+
+    try {
+      // Update in Firestore
+      const userRef = doc(db, 'users', studentId);
+      await updateDoc(userRef, updateField);
+    } catch (err) {
+      console.error('Failed to record vote in Firestore:', err);
+    }
   };
 
   const studentName = userData?.fullName || localStorage.getItem('studentName') || 'MFU Student';
@@ -74,8 +91,10 @@ export default function Dashboard() {
           
           {activeTab === 'ambassadors' && (
             <AmbassadorsTab 
-              votedCandidateId={votedCandidateId} 
+              votedMaleId={userData?.votedMaleId || null} 
+              votedFemaleId={userData?.votedFemaleId || null} 
               onVote={handleVote} 
+              votingFrozen={votingFrozen}
             />
           )}
 
