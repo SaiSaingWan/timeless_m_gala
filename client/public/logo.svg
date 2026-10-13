@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 240" fill="none">
+  <defs>
+    <linearGradient id="goldHex" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A" />
+      <stop offset="40%" stop-color="#F59E0B" />
+      <stop offset="80%" stop-color="#B45309" />
+      <stop offset="100%" stop-color="#451A03" />
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Hexagon Badge -->
+  <polygon points="250,15 350,60 350,170 250,215 150,170 150,60" stroke="url(#goldHex)" stroke-width="2.5" />
+  <polygon points="250,23 342,65 342,165 250,207 158,165 158,65" stroke="url(#goldHex)" stroke-width="1" opacity="0.6" stroke-dasharray="2 2" />
+
+  <!-- Corner Accent Dots -->
+  <circle cx="250" cy="15" r="2.5" fill="url(#goldHex)" />
+  <circle cx="350" cy="60" r="2.5" fill="url(#goldHex)" />
+  <circle cx="350" cy="170" r="2.5" fill="url(#goldHex)" />
+  <circle cx="250" cy="215" r="2.5" fill="url(#goldHex)" />
+  <circle cx="150" cy="170" r="2.5" fill="url(#goldHex)" />
+  <circle cx="150" cy="60" r="2.5" fill="url(#goldHex)" />
+
+  <!-- Clean Interlocking "M" Monogram -->
+  <g stroke="url(#goldHex)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M185 150 V70 L250 135 L315 70 V150" />
+    <path d="M198 150 V88 L250 140 L302 88 V150" stroke-width="2" />
+  </g>
+
+  <!-- Top Crown Emblem -->
+  <path fill="url(#goldHex)" d="M242 38 L246 45 L250 33 L254 45 L258 38 L256 50 L244 50 Z" />
+
+  <!-- Subtitle -->
+  <text x="250" y="184" text-anchor="middle" fill="url(#goldHex)" font-family="'Cinzel', serif" font-size="8" font-weight="800" letter-spacing="5">
+    TIMELESS M-GALA
+  </text>
+</svg>

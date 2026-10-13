@@ -21,6 +21,7 @@ export default function BuyTicket() {
   const [slipPreview, setSlipPreview] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [compressing, setCompressing] = useState(false);
 
   // Form Validation
   const validateForm = () => {
@@ -65,15 +66,62 @@ export default function BuyTicket() {
     setShowPaymentModal(true);
   };
 
-  const handleSlipChange = (e) => {
+  // Helper function to compress images using HTML Canvas before uploading
+  const compressImage = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDimension = 1000; // Resize to max 1000px width/height
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxDimension) {
+              height = Math.round((height * maxDimension) / width);
+              width = maxDimension;
+            }
+          } else {
+            if (height > maxDimension) {
+              width = Math.round((width * maxDimension) / height);
+              height = maxDimension;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Compress to JPEG with 0.7 quality (~100-200KB max payload)
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          resolve(compressedBase64);
+        };
+        img.onerror = (err) => reject(err);
+      };
+      reader.onerror = (err) => reject(err);
+    });
+  };
+
+  const handleSlipChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
       setSlipFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSlipPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+      setCompressing(true);
+      try {
+        const compressedBase64 = await compressImage(file);
+        setSlipPreview(compressedBase64);
+      } catch (err) {
+        console.error('Image compression failed:', err);
+        setError('Failed to process image. Please try another photo.');
+      } finally {
+        setCompressing(false);
+      }
     }
   };
 
@@ -93,7 +141,7 @@ export default function BuyTicket() {
         email,
         phone,
         passcode,
-        ticketPrice: '39.00',
+        ticketPrice: '6.90',
         paymentStatus: 'pending',
         slipUrl: slipPreview,
         votedMaleId: null,
@@ -284,7 +332,7 @@ export default function BuyTicket() {
             <div className="bg-[#1d1d20]/80 border border-zinc-800 rounded-xl p-3 flex justify-between items-center text-xs my-2">
               <span className="text-zinc-400 font-medium">Standard Gala Ticket Pass</span>
               <span className="font-black text-amber-300 text-sm bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-500/20">
-                39 THB
+                6.9 THB
               </span>
             </div>
 
@@ -299,7 +347,7 @@ export default function BuyTicket() {
               ) : (
                 <>
                   <Ticket className="w-4 h-4" />
-                  Confirm & Pay 39 THB
+                  Confirm & Pay 6.9 THB
                 </>
               )}
             </button>
@@ -338,7 +386,7 @@ export default function BuyTicket() {
               <span className="bg-amber-500/10 text-amber-300 font-bold text-[10px] px-2.5 py-0.5 rounded-full border border-amber-500/30 uppercase tracking-wider inline-flex items-center gap-1">
                 <QrCode className="w-3 h-3 text-amber-400" /> PromptPay QR Payment
               </span>
-              <h3 className="text-lg font-extrabold text-zinc-100">Scan & Pay 39 THB</h3>
+              <h3 className="text-lg font-extrabold text-zinc-100">Scan & Pay 6.9 THB</h3>
               <p className="text-xs text-zinc-400">Transfer exact amount to complete registration.</p>
             </div>
 
@@ -360,7 +408,7 @@ export default function BuyTicket() {
                 <p className="text-[11px] text-zinc-300 font-mono">
                   PromptPay / Mobile: <span className="font-bold text-amber-400">081-xxx-3302</span>
                 </p>
-                <p className="text-sm font-extrabold text-zinc-100 pt-0.5">Amount: 39.00 THB</p>
+                <p className="text-sm font-extrabold text-zinc-100 pt-0.5">Amount: 6.9 THB</p>
               </div>
             </div>
 
@@ -370,12 +418,17 @@ export default function BuyTicket() {
                 Upload Payment Transfer Slip
               </label>
 
-              {slipPreview ? (
+              {compressing ? (
+                <div className="rounded-xl border border-amber-500/40 p-4 bg-[#1d1d20] text-center text-xs text-amber-300 flex items-center justify-center gap-2">
+                  <Sparkles className="w-4 h-4 animate-spin text-amber-400" />
+                  <span>Compressing slip photo...</span>
+                </div>
+              ) : slipPreview ? (
                 <div className="relative rounded-xl border border-amber-500/40 p-2 bg-[#1d1d20] flex items-center gap-3">
                   <img src={slipPreview} alt="Slip Preview" className="w-12 h-16 object-cover rounded-md" />
                   <div className="flex-1 text-xs">
                     <p className="font-bold text-amber-300 flex items-center gap-1">
-                      <Check className="w-3.5 h-3.5 text-amber-400" /> Slip Attached
+                      <Check className="w-3.5 h-3.5 text-amber-400" /> Slip Attached & Optimized
                     </p>
                     <p className="text-[10px] text-zinc-400 truncate">{slipFile?.name}</p>
                   </div>
@@ -404,11 +457,14 @@ export default function BuyTicket() {
             {/* Confirm Button */}
             <button
               onClick={completeRegistration}
-              disabled={loading || !slipPreview}
+              disabled={loading || compressing || !slipPreview}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-300 text-zinc-950 font-black text-xs flex items-center justify-center gap-2 hover:brightness-110 cursor-pointer disabled:opacity-40 shadow-lg shadow-amber-500/15"
             >
               {loading ? (
-                <Sparkles className="w-4 h-4 animate-spin text-zinc-950" />
+                <>
+                  <Sparkles className="w-4 h-4 animate-spin text-zinc-950" />
+                  Submitting Registration...
+                </>
               ) : (
                 <>
                   <Check className="w-4 h-4" /> Submit Slip & Complete Registration

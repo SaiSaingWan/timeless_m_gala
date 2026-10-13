@@ -1,18 +1,15 @@
-import { Sparkles, LogOut, User, ShieldCheck } from 'lucide-react';
+import { LogOut, User, ShieldCheck } from 'lucide-react';
 
 export default function Header({ studentName, studentId, onLogout }) {
   return (
     <>
-      <header className="px-5 py-4 flex items-center justify-between border-b border-zinc-800/60 bg-[#0f0f10]/80 backdrop-blur-md sticky top-0 z-40">
+      <header className="px-5 py-3 flex items-center justify-between border-b border-zinc-800/60 bg-[#0f0f10]/80 backdrop-blur-md sticky top-0 z-40">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-amber-500 via-amber-300 to-amber-100 p-[1px]">
-            <div className="w-full h-full bg-[#0f0f10] rounded-lg flex items-center justify-center">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            </div>
-          </div>
-          <span className="font-extrabold text-xs tracking-widest bg-gradient-to-r from-amber-200 via-amber-300 to-amber-400 bg-clip-text text-transparent uppercase">
-            M-GALA PORTAL
-          </span>
+          <img 
+            src="/logo.svg" 
+            alt="Timeless M-Gala Logo" 
+            className="h-9 w-auto object-contain" 
+          />
         </div>
         <button
           onClick={onLogout}

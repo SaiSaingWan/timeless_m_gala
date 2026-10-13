@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { ShieldCheck, Lock, Sparkles, ShieldAlert, ArrowLeft, UserCheck } from 'lucide-react';
+import { Lock, Sparkles, ShieldAlert, ArrowLeft, UserCheck, ShieldCheck } from 'lucide-react';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -66,17 +66,17 @@ export default function AdminLogin() {
         {/* Ambient Glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-amber-300 to-amber-100 p-[1px] mx-auto shadow-lg shadow-amber-500/15">
-            <div className="w-full h-full bg-[#0f0f10] rounded-2xl flex items-center justify-center">
-              <ShieldCheck className="w-6 h-6 text-amber-400" />
-            </div>
-          </div>
+        <div className="text-center space-y-2 relative z-10">
+          <img 
+            src="/logo.svg" 
+            alt="Timeless M-Gala Logo" 
+            className="h-16 w-auto mx-auto mb-3 object-contain" 
+          />
           <h1 className="text-xl font-extrabold text-zinc-100">Gala Admin Portal</h1>
           <p className="text-xs text-zinc-400">Enter Admin ID & 6-Digit Passcode</p>
         </div>
 
-        <form onSubmit={handleAdminLogin} className="space-y-4">
+        <form onSubmit={handleAdminLogin} className="space-y-4 relative z-10">
           {error && (
             <div className="bg-red-950/40 border border-red-500/40 text-red-200 text-xs p-3 rounded-xl text-center font-medium flex items-center justify-center gap-2">
               <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" />
@@ -140,7 +140,7 @@ export default function AdminLogin() {
           </button>
         </form>
 
-        <div className="text-center pt-2">
+        <div className="text-center pt-2 relative z-10">
           <button
             type="button"
             onClick={() => navigate('/')}

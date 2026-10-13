@@ -24,8 +24,27 @@ export default function AdminDashboard() {
       return;
     }
 
+    // Light-weight listener: Omit slipUrl from initial table download for maximum speed
     const unsubUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
-      setUsers(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+      setUsers(
+        snapshot.docs.map((d) => {
+          const data = d.data();
+          return {
+            id: d.id,
+            studentId: data.studentId,
+            fullName: data.fullName,
+            email: data.email,
+            phone: data.phone,
+            paymentStatus: data.paymentStatus,
+            checkedIn: data.checkedIn,
+            votedMaleId: data.votedMaleId,
+            votedFemaleId: data.votedFemaleId,
+            createdAt: data.createdAt,
+            // Track if slip exists without downloading the huge image payload
+            hasSlip: Boolean(data.slipUrl)
+          };
+        })
+      );
     });
 
     const logsQuery = query(collection(db, 'logs'), orderBy('createdAt', 'desc'));
@@ -81,11 +100,13 @@ export default function AdminDashboard() {
         {/* Header Bar */}
         <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[#0f0f10] border border-amber-500/30 p-4 rounded-2xl shadow-xl">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
+            <img 
+              src="/logo.svg" 
+              alt="Timeless M-Gala Logo" 
+              className="h-10 w-auto object-contain" 
+            />
             <div>
-              <h1 className="font-extrabold text-base text-zinc-100">Gala Admin Suite</h1>
+              <h1 className="font-extrabold text-base text-zinc-100">Admin Control Suite</h1>
               <p className="text-xs text-zinc-400">Logged in as: <span className="text-amber-300 font-bold">{adminName}</span></p>
             </div>
           </div>
@@ -112,7 +133,6 @@ export default function AdminDashboard() {
 
         {/* Real-time Insights Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {/* Registered */}
           <div className="bg-[#0f0f10] border border-zinc-800 p-4 rounded-2xl space-y-2 shadow-lg">
             <div className="flex items-center justify-between text-zinc-400">
               <span className="text-[10px] font-bold uppercase tracking-wider">Total Registered</span>
@@ -122,7 +142,6 @@ export default function AdminDashboard() {
             <div className="text-[10px] text-zinc-500">Student Sign-ups</div>
           </div>
 
-          {/* Pending Review */}
           <div className="bg-[#0f0f10] border border-amber-500/30 p-4 rounded-2xl space-y-2 shadow-lg">
             <div className="flex items-center justify-between text-amber-300">
               <span className="text-[10px] font-bold uppercase tracking-wider">Pending Review</span>
@@ -132,7 +151,6 @@ export default function AdminDashboard() {
             <div className="text-[10px] text-amber-500/80">Slips to Approve</div>
           </div>
 
-          {/* Approved / Paid */}
           <div className="bg-[#0f0f10] border border-emerald-500/30 p-4 rounded-2xl space-y-2 shadow-lg">
             <div className="flex items-center justify-between text-emerald-400">
               <span className="text-[10px] font-bold uppercase tracking-wider">Approved / Paid</span>
@@ -142,7 +160,6 @@ export default function AdminDashboard() {
             <div className="text-[10px] text-emerald-500/80">Valid Passes Generated</div>
           </div>
 
-          {/* Gate Checked In */}
           <div className="bg-[#0f0f10] border border-blue-500/30 p-4 rounded-2xl space-y-2 shadow-lg">
             <div className="flex items-center justify-between text-blue-400">
               <span className="text-[10px] font-bold uppercase tracking-wider">Checked In</span>
