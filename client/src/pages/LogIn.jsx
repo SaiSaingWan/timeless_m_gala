@@ -170,7 +170,7 @@ export default function LogInPage() {
               className="w-full py-2.5 rounded-xl bg-[#1d1d20] border border-amber-500/30 text-amber-300 text-xs font-semibold flex items-center justify-center gap-2 hover:bg-[#27272a] transition-all cursor-pointer"
             >
               <Ticket className="w-3.5 h-3.5 text-amber-400" />
-              Buy Ticket Pass (39 THB)
+              Buy Ticket Pass (6.9 THB)
             </button>
           </div>
 

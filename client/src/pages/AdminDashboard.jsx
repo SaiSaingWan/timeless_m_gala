@@ -2,18 +2,21 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, onSnapshot, addDoc, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebase';
-import { ShieldCheck, LogOut, Download, QrCode, UserCheck, History, Ticket, Clock, CheckCircle2, UserCheck as GateIcon } from 'lucide-react';
+import { ShieldCheck, LogOut, Download, QrCode, UserCheck, History, Ticket, Clock, CheckCircle2, UserCheck as GateIcon, Flower, BarChart3 } from 'lucide-react';
 
 import AdminScannerTab from '../components/admin/AdminScannerTab';
 import AdminPassesTab from '../components/admin/AdminPassesTab';
 import AdminVotesTab from '../components/admin/AdminVotesTab';
 import AdminAuditLogsTab from '../components/admin/AdminAuditLogsTab';
+import AdminFlowerOrdersTab from '../components/admin/AdminFlowerOrdersTab';
+import AdminFlowerStatsTab from '../components/admin/AdminFlowerStatsTab';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('scanner');
   const [users, setUsers] = useState([]);
   const [logs, setLogs] = useState([]);
+  const [flowerOrders, setFlowerOrders] = useState([]);
 
   const adminName = localStorage.getItem('adminName') || 'System Admin';
 
@@ -24,7 +27,6 @@ export default function AdminDashboard() {
       return;
     }
 
-    // Light-weight listener: Omit slipUrl from initial table download for maximum speed
     const unsubUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
       setUsers(
         snapshot.docs.map((d) => {
@@ -40,7 +42,6 @@ export default function AdminDashboard() {
             votedMaleId: data.votedMaleId,
             votedFemaleId: data.votedFemaleId,
             createdAt: data.createdAt,
-            // Track if slip exists without downloading the huge image payload
             hasSlip: Boolean(data.slipUrl)
           };
         })
@@ -52,9 +53,14 @@ export default function AdminDashboard() {
       setLogs(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
     });
 
+    const unsubFlowerOrders = onSnapshot(collection(db, 'flowerOrders'), (snapshot) => {
+      setFlowerOrders(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
+
     return () => {
       unsubUsers();
       unsubLogs();
+      unsubFlowerOrders();
     };
   }, [navigate]);
 
@@ -92,6 +98,7 @@ export default function AdminDashboard() {
   const totalPending = users.filter((u) => u.paymentStatus === 'pending').length;
   const totalPaid = users.filter((u) => u.paymentStatus === 'approved').length;
   const totalCheckedIn = users.filter((u) => u.checkedIn).length;
+  const pendingFlowerOrders = flowerOrders.filter((o) => (o.status || 'pending') === 'pending').length;
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-zinc-100 font-sans p-4 md:p-8">
@@ -171,14 +178,14 @@ export default function AdminDashboard() {
         </div>
 
         {/* Modular Navigation Bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 bg-[#0f0f10] p-1.5 rounded-2xl border border-zinc-800 gap-1.5">
+        <div className="grid grid-cols-2 sm:grid-cols-6 bg-[#0f0f10] p-1.5 rounded-2xl border border-zinc-800 gap-1.5">
           <button
             onClick={() => setActiveTab('scanner')}
             className={`py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'scanner' ? 'bg-amber-400 text-zinc-950 shadow-md' : 'text-zinc-400 hover:text-zinc-200'
             }`}
           >
-            <QrCode className="w-4 h-4" /> Camera Gate Scanner
+            <QrCode className="w-4 h-4" /> Camera Scanner
           </button>
           
           <button
@@ -193,6 +200,29 @@ export default function AdminDashboard() {
                 {totalPending}
               </span>
             )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('flowers')}
+            className={`py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              activeTab === 'flowers' ? 'bg-amber-400 text-zinc-950 shadow-md' : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            <Flower className="w-4 h-4 text-pink-400" /> Flower Orders
+            {pendingFlowerOrders > 0 && (
+              <span className="bg-pink-500 text-zinc-950 text-[10px] font-black px-1.5 py-0.2 rounded-full">
+                {pendingFlowerOrders}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('flowerStats')}
+            className={`py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              activeTab === 'flowerStats' ? 'bg-amber-400 text-zinc-950 shadow-md' : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            <BarChart3 className="w-4 h-4 text-amber-400" /> Flower Tally
           </button>
 
           <button
@@ -217,6 +247,8 @@ export default function AdminDashboard() {
         {/* Tab Components */}
         {activeTab === 'scanner' && <AdminScannerTab users={users} createAuditLog={createAuditLog} />}
         {activeTab === 'users' && <AdminPassesTab users={users} createAuditLog={createAuditLog} />}
+        {activeTab === 'flowers' && <AdminFlowerOrdersTab createAuditLog={createAuditLog} />}
+        {activeTab === 'flowerStats' && <AdminFlowerStatsTab />}
         {activeTab === 'votes' && <AdminVotesTab users={users} createAuditLog={createAuditLog} />}
         {activeTab === 'logs' && <AdminAuditLogsTab logs={logs} />}
 

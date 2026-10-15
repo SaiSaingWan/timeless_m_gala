@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { doc, getDoc, updateDoc, writeBatch } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { Search, Eye, CheckSquare, XCircle, CheckCircle2, ZoomIn, ZoomOut, RotateCw, Sparkles } from 'lucide-react';
+import { Search, Eye, CheckSquare, XCircle, CheckCircle2, ZoomIn, ZoomOut, RotateCw, Sparkles, Filter } from 'lucide-react';
 
 export default function AdminPassesTab({ users, createAuditLog }) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'pending' | 'approved' | 'rejected'
   const [selectedSlip, setSelectedSlip] = useState(null);
   const [loadingSlip, setLoadingSlip] = useState(false);
   const [selectedUserIds, setSelectedUserIds] = useState([]);
@@ -61,35 +62,102 @@ export default function AdminPassesTab({ users, createAuditLog }) {
     setRejectionReason('');
   };
 
-  const filteredUsers = users.filter((u) =>
-    u.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.studentId?.includes(searchTerm)
-  );
+  // Real-time status counts
+  const counts = {
+    all: users.length,
+    pending: users.filter((u) => (u.paymentStatus || 'pending') === 'pending').length,
+    approved: users.filter((u) => u.paymentStatus === 'approved').length,
+    rejected: users.filter((u) => u.paymentStatus === 'rejected').length
+  };
+
+  // Filter users by search term AND selected status tab
+  const filteredUsers = users.filter((u) => {
+    const matchesSearch =
+      u.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.studentId?.includes(searchTerm);
+
+    const userStatus = u.paymentStatus || 'pending';
+    const matchesStatus = statusFilter === 'all' || userStatus === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-center">
-        <div className="relative w-full sm:w-72">
+      {/* Top Control Bar: Search & Status Filter Tabs */}
+      <div className="flex flex-col md:flex-row gap-3 justify-between items-stretch md:items-center">
+        
+        {/* Search Input */}
+        <div className="relative w-full md:w-64">
           <Search className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search ID, Name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-[#0f0f10] border border-zinc-800 rounded-xl py-2 pl-9 pr-3 text-xs text-zinc-100 focus:border-amber-400"
+            className="w-full bg-[#0f0f10] border border-zinc-800 rounded-xl py-2 pl-9 pr-3 text-xs text-zinc-100 focus:border-amber-400 focus:outline-none"
           />
         </div>
 
+        {/* Status Filter Tabs */}
+        <div className="flex items-center gap-1 bg-[#0f0f10] p-1 border border-zinc-800 rounded-xl text-xs overflow-x-auto">
+          <button
+            onClick={() => setStatusFilter('all')}
+            className={`px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              statusFilter === 'all'
+                ? 'bg-zinc-800 text-zinc-100 shadow-sm'
+                : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            All <span className="text-[10px] bg-zinc-900 px-1.5 py-0.2 rounded-full border border-zinc-700">{counts.all}</span>
+          </button>
+
+          <button
+            onClick={() => setStatusFilter('pending')}
+            className={`px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              statusFilter === 'pending'
+                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                : 'text-zinc-400 hover:text-amber-300'
+            }`}
+          >
+            Pending <span className="text-[10px] bg-amber-500/30 text-amber-300 px-1.5 py-0.2 rounded-full">{counts.pending}</span>
+          </button>
+
+          <button
+            onClick={() => setStatusFilter('approved')}
+            className={`px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              statusFilter === 'approved'
+                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                : 'text-zinc-400 hover:text-emerald-400'
+            }`}
+          >
+            Approved <span className="text-[10px] bg-emerald-500/30 text-emerald-300 px-1.5 py-0.2 rounded-full">{counts.approved}</span>
+          </button>
+
+          <button
+            onClick={() => setStatusFilter('rejected')}
+            className={`px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              statusFilter === 'rejected'
+                ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                : 'text-zinc-400 hover:text-red-400'
+            }`}
+          >
+            Rejected <span className="text-[10px] bg-red-500/30 text-red-300 px-1.5 py-0.2 rounded-full">{counts.rejected}</span>
+          </button>
+        </div>
+
+        {/* Bulk Approve Action */}
         {selectedUserIds.length > 0 && (
           <button
             onClick={handleBulkApprove}
-            className="py-2 px-4 bg-emerald-500 text-zinc-950 font-black text-xs rounded-xl hover:bg-emerald-400 transition-all cursor-pointer flex items-center gap-1.5"
+            className="py-2 px-4 bg-emerald-500 text-zinc-950 font-black text-xs rounded-xl hover:bg-emerald-400 transition-all cursor-pointer flex items-center gap-1.5 justify-center"
           >
             <CheckSquare className="w-4 h-4" /> Approve Selected ({selectedUserIds.length})
           </button>
         )}
       </div>
 
+      {/* Table Data */}
       <div className="bg-[#0f0f10] border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
@@ -111,61 +179,69 @@ export default function AdminPassesTab({ users, createAuditLog }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
-              {filteredUsers.map((u) => (
-                <tr key={u.id} className="hover:bg-[#1d1d20]/50 transition-colors">
-                  <td className="p-3.5">
-                    <input
-                      type="checkbox"
-                      checked={selectedUserIds.includes(u.studentId)}
-                      onChange={(e) =>
-                        setSelectedUserIds((prev) =>
-                          e.target.checked
-                            ? [...prev, u.studentId]
-                            : prev.filter((id) => id !== u.studentId)
-                        )
-                      }
-                    />
-                  </td>
-                  <td className="p-3.5 font-bold text-zinc-100">{u.fullName}</td>
-                  <td className="p-3.5 font-mono text-zinc-400">{u.studentId}</td>
-                  <td className="p-3.5">
-                    {u.hasSlip ? (
-                      <button
-                        onClick={() => handleOpenSlip(u)}
-                        className="text-amber-400 underline font-semibold flex items-center gap-1 cursor-pointer hover:text-amber-300"
-                      >
-                        <Eye className="w-3.5 h-3.5" /> View Slip
-                      </button>
-                    ) : (
-                      <span className="text-zinc-600 italic">None</span>
-                    )}
-                  </td>
-                  <td className="p-3.5">
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        u.paymentStatus === 'approved'
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                          : u.paymentStatus === 'rejected'
-                          ? 'bg-red-500/10 text-red-400 border border-red-500/30'
-                          : 'bg-amber-500/10 text-amber-300 border border-amber-500/30'
-                      }`}
-                    >
-                      {u.paymentStatus?.toUpperCase() || 'PENDING'}
-                    </span>
-                  </td>
-                  <td className="p-3.5">
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-                        u.checkedIn
-                          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                          : 'bg-zinc-800 text-zinc-500'
-                      }`}
-                    >
-                      {u.checkedIn ? 'CHECKED IN' : 'OUT'}
-                    </span>
+              {filteredUsers.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="p-8 text-center text-zinc-500 italic">
+                    No users found matching the selected filter.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredUsers.map((u) => (
+                  <tr key={u.id} className="hover:bg-[#1d1d20]/50 transition-colors">
+                    <td className="p-3.5">
+                      <input
+                        type="checkbox"
+                        checked={selectedUserIds.includes(u.studentId)}
+                        onChange={(e) =>
+                          setSelectedUserIds((prev) =>
+                            e.target.checked
+                              ? [...prev, u.studentId]
+                              : prev.filter((id) => id !== u.studentId)
+                          )
+                        }
+                      />
+                    </td>
+                    <td className="p-3.5 font-bold text-zinc-100">{u.fullName}</td>
+                    <td className="p-3.5 font-mono text-zinc-400">{u.studentId}</td>
+                    <td className="p-3.5">
+                      {u.hasSlip ? (
+                        <button
+                          onClick={() => handleOpenSlip(u)}
+                          className="text-amber-400 underline font-semibold flex items-center gap-1 cursor-pointer hover:text-amber-300"
+                        >
+                          <Eye className="w-3.5 h-3.5" /> View Slip
+                        </button>
+                      ) : (
+                        <span className="text-zinc-600 italic">None</span>
+                      )}
+                    </td>
+                    <td className="p-3.5">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          u.paymentStatus === 'approved'
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                            : u.paymentStatus === 'rejected'
+                            ? 'bg-red-500/10 text-red-400 border border-red-500/30'
+                            : 'bg-amber-500/10 text-amber-300 border border-amber-500/30'
+                        }`}
+                      >
+                        {u.paymentStatus?.toUpperCase() || 'PENDING'}
+                      </span>
+                    </td>
+                    <td className="p-3.5">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                          u.checkedIn
+                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                            : 'bg-zinc-800 text-zinc-500'
+                        }`}
+                      >
+                        {u.checkedIn ? 'CHECKED IN' : 'OUT'}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

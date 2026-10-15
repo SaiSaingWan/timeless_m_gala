@@ -4,24 +4,24 @@ import { db } from '../../firebase';
 import { Lock, Unlock, Users } from 'lucide-react';
 
 const maleCandidates = [
-  { id: 'm1', name: 'Wai Phyo Zaw', number: 'Male #01', image: '/males/3.webp' },
-  { id: 'm2', name: 'Thukha Nyan', number: 'Male #02', image: '/males/4.webp' },
-  { id: 'm3', name: 'Saw Hay Let Bwe Htoo', number: 'Male #03', image: '/males/5.webp' },
-  { id: 'm4', name: 'Maw Kun', number: 'Male #04', image: '/males/10.webp' },
-  { id: 'm5', name: 'Aung Phone Thant', number: 'Male #05', image: '/males/13.webp' },
-  { id: 'm6', name: 'Hein Htet Aung', number: 'Male #06', image: '/males/14.webp' },
-  { id: 'm7', name: 'Min Htet Aung', number: 'Male #07', image: '/males/15.webp' }
+  { id: 'm1', name: 'Aung Phone Thant', number: 'Male #01', image: '/males/13.webp' },
+  { id: 'm2', name: 'Thu Kha Nyan', number: 'Male #02', image: '/males/4.webp' },
+  { id: 'm3', name: 'Min Htet', number: 'Male #03', image: '/males/15.webp' },
+  { id: 'm4', name: 'Hein Htet Aung', number: 'Male #04', image: '/males/14.webp' },
+  { id: 'm5', name: 'Saw Hey Let Bwe Htoo', number: 'Male #05', image: '/males/5.webp' },
+  { id: 'm6', name: 'Wai Phyo Zaw', number: 'Male #06', image: '/males/3.webp' },
+  { id: 'm7', name: 'Maw Kun', number: 'Male #07', image: '/males/10.webp' }
 ];
 
 const femaleCandidates = [
-  { id: 'f1', name: 'Yunn Eaint Myint Mo', number: 'Female #01', image: '/females/1.webp' },
-  { id: 'f2', name: 'Wati Thae Maung', number: 'Female #02', image: '/females/2.webp' },
+  { id: 'f1', name: 'Wati Thae Maung', number: 'Female #01', image: '/females/2.webp' },
+  { id: 'f2', name: 'Phyo Thiri Khaing', number: 'Female #02', image: '/females/7.webp' },
   { id: 'f3', name: 'Pyae Sone Chan Thar', number: 'Female #03', image: '/females/6.webp' },
-  { id: 'f4', name: 'Phyo Thiri Khaing', number: 'Female #04', image: '/females/7.webp' },
-  { id: 'f5', name: 'Ngwe Kant Kaw', number: 'Female #05', image: '/females/8.webp' },
-  { id: 'f6', name: 'Naw Mercy Zaw', number: 'Female #06', image: '/females/9.webp' },
+  { id: 'f4', name: 'Hsu Yi Htwe', number: 'Female #04', image: '/females/12.webp' },
+  { id: 'f5', name: 'Naw Mercy Zaw', number: 'Female #05', image: '/females/9.webp' },
+  { id: 'f6', name: 'Yunn Eaint Myint Mo', number: 'Female #06', image: '/females/1.webp' },
   { id: 'f7', name: 'Nang Aye Aye Aung', number: 'Female #07', image: '/females/11.webp' },
-  { id: 'f8', name: 'Hsu Yi Htwe', number: 'Female #08', image: '/females/12.webp' }
+  { id: 'f8', name: 'Ngwe Kant Kaw', number: 'Female #08', image: '/females/8.webp' }
 ];
 
 export default function AdminVotesTab({ users, createAuditLog }) {
@@ -87,7 +87,7 @@ export default function AdminVotesTab({ users, createAuditLog }) {
 
       {/* SECTION 1: FEMALE CANDIDATES (TOP) */}
       <div className="bg-[#0f0f10] border border-zinc-800 p-5 rounded-2xl space-y-4 shadow-xl overflow-hidden">
-        {/* Female Banner - Original Ratio */}
+        {/* Female Banner */}
         <div className="w-full rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900">
           <img 
             src="/femalebanner.webp" 
@@ -160,7 +160,7 @@ export default function AdminVotesTab({ users, createAuditLog }) {
 
       {/* SECTION 2: MALE CANDIDATES (BELOW) */}
       <div className="bg-[#0f0f10] border border-zinc-800 p-5 rounded-2xl space-y-4 shadow-xl overflow-hidden">
-        {/* Male Banner - Original Ratio */}
+        {/* Male Banner */}
         <div className="w-full rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900">
           <img 
             src="/malebanner.webp" 

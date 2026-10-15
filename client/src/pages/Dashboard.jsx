@@ -7,6 +7,8 @@ import BottomNav from '../components/BottomNav';
 import EventsTab from '../components/EventsTab';
 import AmbassadorsTab from '../components/AmbassadorsTab';
 import TicketTab from '../components/TicketTab';
+import ShopTab from '../components/ShopTab';
+import MokePhoeTab from '../components/MokePhoeTab';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -59,11 +61,9 @@ export default function Dashboard() {
 
     const updateField = category === 'male' ? { votedMaleId: candidateId } : { votedFemaleId: candidateId };
 
-    // Update local state immediately for fast feedback
     setUserData((prev) => ({ ...prev, ...updateField }));
 
     try {
-      // Update in Firestore
       const userRef = doc(db, 'users', studentId);
       await updateDoc(userRef, updateField);
     } catch (err) {
@@ -83,6 +83,7 @@ export default function Dashboard() {
         <Header 
           studentName={studentName} 
           studentId={studentId} 
+          flowerBalance={userData?.flowerBalance || 0}
           onLogout={handleLogout} 
         />
 
@@ -107,6 +108,10 @@ export default function Dashboard() {
               checkedIn={userData?.checkedIn || false} 
             />
           )}
+
+          {activeTab === 'shop' && <ShopTab user={userData} />}
+
+          {activeTab === 'mokephoe' && <MokePhoeTab user={userData} />}
         </main>
 
         <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />

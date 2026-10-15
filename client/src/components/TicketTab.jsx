@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { Calendar, Ticket, Clock, ShieldAlert, CheckCircle2, Download, Sparkles, XCircle } from 'lucide-react';
+import { Calendar, Ticket, Clock, ShieldAlert, CheckCircle2, Download, Sparkles, XCircle, MapPin } from 'lucide-react';
 import { toPng } from 'html-to-image';
 
 export default function TicketTab({ studentId, studentName, paymentStatus = 'pending', checkedIn = false }) {
@@ -131,7 +131,7 @@ export default function TicketTab({ studentId, studentName, paymentStatus = 'pen
           <div className="bg-[#0f0f10]/85 backdrop-blur-md border border-zinc-800 rounded-xl p-3 text-left space-y-1">
             <Calendar className="w-4 h-4 text-amber-400" />
             <div className="text-[10px] text-zinc-400 uppercase font-bold">Date & Time</div>
-            <div className="text-xs font-bold text-zinc-100">Nov 18 • 18:00 PM</div>
+            <div className="text-xs font-bold text-zinc-100">Oct 18 • 16:30 - 21:00</div>
           </div>
 
           <div className="bg-[#0f0f10]/85 backdrop-blur-md border border-zinc-800 rounded-xl p-3 text-left space-y-1">
@@ -140,7 +140,7 @@ export default function TicketTab({ studentId, studentName, paymentStatus = 'pen
             <div className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
               {isApproved ? (
                 <span className="text-emerald-400 flex items-center gap-1 font-extrabold">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> PAID (6.9 THB)
+                  <CheckCircle2 className="w-3.5 h-3.5" /> PAID
                 </span>
               ) : isRejected ? (
                 <span className="text-red-400 flex items-center gap-1 font-extrabold">
@@ -149,7 +149,7 @@ export default function TicketTab({ studentId, studentName, paymentStatus = 'pen
               ) : (
                 <span className="text-amber-300 flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-block" />
-                  PENDING (6.9 THB)
+                  PENDING
                 </span>
               )}
             </div>
@@ -187,7 +187,7 @@ export default function TicketTab({ studentId, studentName, paymentStatus = 'pen
           </div>
           <div className="flex justify-between text-zinc-400">
             <span>Venue</span>
-            <span className="font-semibold text-zinc-100">Main Auditorium</span>
+            <span className="font-semibold text-zinc-100">C4 Auditorium</span>
           </div>
         </div>
       </div>
