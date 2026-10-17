@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { doc, getDoc, updateDoc, writeBatch } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { Search, Eye, CheckSquare, XCircle, CheckCircle2, ZoomIn, ZoomOut, RotateCw, Sparkles, Filter } from 'lucide-react';
+import { Search, Eye, CheckSquare, XCircle, CheckCircle2, ZoomIn, ZoomOut, RotateCw, Sparkles, UserCheck } from 'lucide-react';
 
 export default function AdminPassesTab({ users, createAuditLog }) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'pending' | 'approved' | 'rejected'
+  const [statusFilter, setStatusFilter] = useState('pending'); // 'all' | 'pending' | 'approved' | 'rejected' | 'checkedIn'
   const [selectedSlip, setSelectedSlip] = useState(null);
   const [loadingSlip, setLoadingSlip] = useState(false);
   const [selectedUserIds, setSelectedUserIds] = useState([]);
@@ -67,7 +67,8 @@ export default function AdminPassesTab({ users, createAuditLog }) {
     all: users.length,
     pending: users.filter((u) => (u.paymentStatus || 'pending') === 'pending').length,
     approved: users.filter((u) => u.paymentStatus === 'approved').length,
-    rejected: users.filter((u) => u.paymentStatus === 'rejected').length
+    rejected: users.filter((u) => u.paymentStatus === 'rejected').length,
+    checkedIn: users.filter((u) => u.checkedIn).length
   };
 
   // Filter users by search term AND selected status tab
@@ -77,7 +78,15 @@ export default function AdminPassesTab({ users, createAuditLog }) {
       u.studentId?.includes(searchTerm);
 
     const userStatus = u.paymentStatus || 'pending';
-    const matchesStatus = statusFilter === 'all' || userStatus === statusFilter;
+    
+    let matchesStatus = false;
+    if (statusFilter === 'all') {
+      matchesStatus = true;
+    } else if (statusFilter === 'checkedIn') {
+      matchesStatus = Boolean(u.checkedIn);
+    } else {
+      matchesStatus = userStatus === statusFilter;
+    }
 
     return matchesSearch && matchesStatus;
   });
@@ -143,6 +152,17 @@ export default function AdminPassesTab({ users, createAuditLog }) {
             }`}
           >
             Rejected <span className="text-[10px] bg-red-500/30 text-red-300 px-1.5 py-0.2 rounded-full">{counts.rejected}</span>
+          </button>
+
+          <button
+            onClick={() => setStatusFilter('checkedIn')}
+            className={`px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              statusFilter === 'checkedIn'
+                ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                : 'text-zinc-400 hover:text-blue-300'
+            }`}
+          >
+            Checked In <span className="text-[10px] bg-blue-500/30 text-blue-300 px-1.5 py-0.2 rounded-full">{counts.checkedIn}</span>
           </button>
         </div>
 
