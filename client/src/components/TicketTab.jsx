@@ -140,7 +140,7 @@ export default function TicketTab({ studentId, studentName, paymentStatus = 'pen
             <div className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
               {isApproved ? (
                 <span className="text-emerald-400 flex items-center gap-1 font-extrabold">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> PAID
+                  <CheckCircle2 className="w-3.5 h-3.5" /> PAID (69 THB)
                 </span>
               ) : isRejected ? (
                 <span className="text-red-400 flex items-center gap-1 font-extrabold">
@@ -149,7 +149,7 @@ export default function TicketTab({ studentId, studentName, paymentStatus = 'pen
               ) : (
                 <span className="text-amber-300 flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-block" />
-                  PENDING
+                  PENDING (69 THB)
                 </span>
               )}
             </div>

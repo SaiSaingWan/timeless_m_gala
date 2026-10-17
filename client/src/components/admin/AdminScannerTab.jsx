@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { Html5Qrcode } from 'html5-qrcode';
-import { QrCode, CheckCircle2, AlertTriangle, Search, UserCheck, ShieldAlert, Check, Camera } from 'lucide-react';
+import { QrCode, CheckCircle2, AlertTriangle, Search, UserCheck, ShieldAlert, Check, Camera, Sparkles } from 'lucide-react';
 
-export default function AdminScannerTab({ users, createAuditLog }) {
+export default function AdminScannerTab({ createAuditLog }) {
   const [scanResult, setScanResult] = useState(null);
   const [manualSearch, setManualSearch] = useState('');
+  const [manualSearchResult, setManualSearchResult] = useState(null);
+  const [searchingManual, setSearchingManual] = useState(false);
   const [cameras, setCameras] = useState([]);
   const [selectedCameraId, setSelectedCameraId] = useState('');
   const html5QrCodeRef = useRef(null);
@@ -37,62 +39,94 @@ export default function AdminScannerTab({ users, createAuditLog }) {
     }
   };
 
+  // 1. Direct On-Demand Scan Processing (1 Read per Scan)
   const handleProcessScan = async (studentId) => {
-    const user = users.find((u) => u.studentId === studentId);
-
-    if (!user) {
-      playSound('error');
-      setScanResult({
-        status: 'error',
-        title: 'PASS NOT FOUND',
-        message: `No registration found for ID: ${studentId}`,
-        user: null
-      });
-      await createAuditLog('SCAN_FAILED', `Scanned unknown ID: ${studentId}`, studentId);
-      return;
-    }
-
-    if (user.paymentStatus !== 'approved') {
-      playSound('error');
-      setScanResult({
-        status: 'error',
-        title: 'PAYMENT UNVERIFIED',
-        message: `${user.fullName}'s payment slip is pending review.`,
-        user
-      });
-      await createAuditLog('SCAN_DENIED', `Denied entry for ${user.fullName} (Unpaid)`, studentId);
-      return;
-    }
-
-    if (user.checkedIn) {
-      playSound('error');
-      setScanResult({
-        status: 'warning',
-        title: 'ALREADY CHECKED IN!',
-        message: `Pass previously scanned. DO NOT ADMIT AGAIN.`,
-        user
-      });
-      await createAuditLog('SCAN_DUPLICATE', `Duplicate entry attempt for ${user.fullName}`, studentId);
-      return;
-    }
-
     try {
-      await updateDoc(doc(db, 'users', studentId), {
+      const userDocRef = doc(db, 'users', studentId);
+      const userSnap = await getDoc(userDocRef);
+
+      if (!userSnap.exists()) {
+        playSound('error');
+        setScanResult({
+          status: 'error',
+          title: 'PASS NOT FOUND',
+          message: `No registration found for ID: ${studentId}`,
+          user: null
+        });
+        if (createAuditLog) await createAuditLog('SCAN_FAILED', `Scanned unknown ID: ${studentId}`, studentId);
+        return;
+      }
+
+      const user = { id: userSnap.id, ...userSnap.data() };
+
+      if (user.paymentStatus !== 'approved') {
+        playSound('error');
+        setScanResult({
+          status: 'error',
+          title: 'PAYMENT UNVERIFIED',
+          message: `${user.fullName}'s payment slip is pending review.`,
+          user
+        });
+        if (createAuditLog) await createAuditLog('SCAN_DENIED', `Denied entry for ${user.fullName} (Unpaid)`, studentId);
+        return;
+      }
+
+      if (user.checkedIn) {
+        playSound('error');
+        setScanResult({
+          status: 'warning',
+          title: 'ALREADY CHECKED IN!',
+          message: `Pass previously scanned. DO NOT ADMIT AGAIN.`,
+          user
+        });
+        if (createAuditLog) await createAuditLog('SCAN_DUPLICATE', `Duplicate entry attempt for ${user.fullName}`, studentId);
+        return;
+      }
+
+      await updateDoc(userDocRef, {
         checkedIn: true,
         checkedInAt: new Date().toISOString()
       });
+
       playSound('success');
       setScanResult({
         status: 'success',
         title: 'GATE ENTRY GRANTED',
         message: `Welcome ${user.fullName}`,
-        user
+        user: { ...user, checkedIn: true }
       });
-      await createAuditLog('GATE_CHECKIN', `Admitted ${user.fullName} at gate`, studentId);
+      if (createAuditLog) await createAuditLog('GATE_CHECKIN', `Admitted ${user.fullName} at gate`, studentId);
     } catch (err) {
       console.error('Check-in error:', err);
     }
   };
+
+  // 2. Direct Manual Lookup
+  useEffect(() => {
+    const cleanSearch = manualSearch.trim();
+    if (!cleanSearch) {
+      setManualSearchResult(null);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setSearchingManual(true);
+      try {
+        const userSnap = await getDoc(doc(db, 'users', cleanSearch));
+        if (userSnap.exists()) {
+          setManualSearchResult([{ id: userSnap.id, ...userSnap.data() }]);
+        } else {
+          setManualSearchResult([]);
+        }
+      } catch (err) {
+        console.error('Manual search failed:', err);
+      } finally {
+        setSearchingManual(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [manualSearch]);
 
   const handleManualCheckIn = async (user) => {
     if (user.checkedIn) return;
@@ -114,19 +148,21 @@ export default function AdminScannerTab({ users, createAuditLog }) {
         message: `Manually admitted ${user.fullName}`,
         user: { ...user, checkedIn: true }
       });
-      await createAuditLog('MANUAL_CHECKIN', `Manually admitted ${user.fullName} at gate`, user.studentId);
+      setManualSearchResult((prev) =>
+        prev ? prev.map((u) => (u.studentId === user.studentId ? { ...u, checkedIn: true } : u)) : []
+      );
+      if (createAuditLog) await createAuditLog('MANUAL_CHECKIN', `Manually admitted ${user.fullName} at gate`, user.studentId);
     } catch (err) {
       console.error('Manual check-in failed:', err);
     }
   };
 
-  // 1. Get List of Available Physical Cameras & Filter out OBS Virtual Camera
+  // 3. Camera Detection
   useEffect(() => {
     Html5Qrcode.getCameras()
       .then((devices) => {
         if (devices && devices.length > 0) {
           setCameras(devices);
-          // Prefer physical laptop/phone camera over virtual devices like OBS
           const physicalCam = devices.find((d) => !d.label.toLowerCase().includes('obs')) || devices[0];
           setSelectedCameraId(physicalCam.id);
         }
@@ -134,7 +170,7 @@ export default function AdminScannerTab({ users, createAuditLog }) {
       .catch((err) => console.error('Camera enumeration error:', err));
   }, []);
 
-  // 2. Start Scanner with Selected Camera Device
+  // 4. Scanner Stream Initialization
   useEffect(() => {
     if (!selectedCameraId) return;
 
@@ -158,15 +194,7 @@ export default function AdminScannerTab({ users, createAuditLog }) {
         html5QrCodeRef.current.stop().catch((err) => console.error('Scanner stop error:', err));
       }
     };
-  }, [selectedCameraId, users]);
-
-  const manualMatches = manualSearch.trim()
-    ? users.filter(
-        (u) =>
-          u.studentId?.includes(manualSearch.trim()) ||
-          u.fullName?.toLowerCase().includes(manualSearch.trim().toLowerCase())
-      )
-    : [];
+  }, [selectedCameraId]);
 
   return (
     <div className="space-y-6">
@@ -182,7 +210,6 @@ export default function AdminScannerTab({ users, createAuditLog }) {
             </span>
           </div>
 
-          {/* Camera Selection Dropdown */}
           {cameras.length > 1 && (
             <div className="flex items-center gap-2 bg-[#1d1d20] border border-zinc-800 p-2 rounded-xl text-xs text-zinc-300">
               <Camera className="w-4 h-4 text-amber-400 shrink-0" />
@@ -253,14 +280,14 @@ export default function AdminScannerTab({ users, createAuditLog }) {
           <h3 className="font-extrabold text-sm text-zinc-100 flex items-center gap-2">
             <UserCheck className="w-4 h-4 text-amber-400" /> Manual Gate Entry Override
           </h3>
-          <p className="text-xs text-zinc-400">Search student ID or name directly to check in manually if QR camera scan fails.</p>
+          <p className="text-xs text-zinc-400">Search 10-digit Student ID directly to check in manually if QR camera scan fails.</p>
         </div>
 
         <div className="relative">
           <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search Student ID or Name..."
+            placeholder="Enter Student ID (e.g. 6731503084)..."
             value={manualSearch}
             onChange={(e) => setManualSearch(e.target.value)}
             className="w-full bg-[#1d1d20] border border-zinc-800 rounded-xl py-2.5 pl-10 pr-4 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-400 transition-all font-mono"
@@ -270,10 +297,14 @@ export default function AdminScannerTab({ users, createAuditLog }) {
         {/* Search Results List */}
         {manualSearch.trim() && (
           <div className="space-y-2 border-t border-zinc-800/80 pt-3">
-            {manualMatches.length === 0 ? (
-              <p className="text-xs text-zinc-500 text-center py-4">No matching student record found.</p>
+            {searchingManual ? (
+              <p className="text-xs text-amber-300 text-center py-4 flex items-center justify-center gap-2">
+                <Sparkles className="w-4 h-4 animate-spin text-amber-400" /> Searching record...
+              </p>
+            ) : !manualSearchResult || manualSearchResult.length === 0 ? (
+              <p className="text-xs text-zinc-500 text-center py-4">No student found matching ID "{manualSearch}".</p>
             ) : (
-              manualMatches.map((u) => {
+              manualSearchResult.map((u) => {
                 const isPaid = u.paymentStatus === 'approved';
                 const isChecked = u.checkedIn;
 

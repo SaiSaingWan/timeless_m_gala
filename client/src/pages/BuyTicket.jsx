@@ -141,7 +141,7 @@ export default function BuyTicket() {
         email,
         phone,
         passcode,
-        ticketPrice: '6.90',
+        ticketPrice: '69.00',
         paymentStatus: 'pending',
         slipUrl: slipPreview,
         votedMaleId: null,
@@ -332,7 +332,7 @@ export default function BuyTicket() {
             <div className="bg-[#1d1d20]/80 border border-zinc-800 rounded-xl p-3 flex justify-between items-center text-xs my-2">
               <span className="text-zinc-400 font-medium">Standard Gala Ticket Pass</span>
               <span className="font-black text-amber-300 text-sm bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-500/20">
-                6.9 THB
+                69 THB
               </span>
             </div>
 
@@ -347,7 +347,7 @@ export default function BuyTicket() {
               ) : (
                 <>
                   <Ticket className="w-4 h-4" />
-                  Confirm & Pay 6.9 THB
+                  Confirm & Pay 69 THB
                 </>
               )}
             </button>
@@ -386,7 +386,7 @@ export default function BuyTicket() {
               <span className="bg-amber-500/10 text-amber-300 font-bold text-[10px] px-2.5 py-0.5 rounded-full border border-amber-500/30 uppercase tracking-wider inline-flex items-center gap-1">
                 <QrCode className="w-3 h-3 text-amber-400" /> PromptPay QR Payment
               </span>
-              <h3 className="text-lg font-extrabold text-zinc-100">Scan & Pay 6.9 THB</h3>
+              <h3 className="text-lg font-extrabold text-zinc-100">Scan & Pay 69 THB</h3>
               <p className="text-xs text-zinc-400">Transfer exact amount to complete registration.</p>
             </div>
 
@@ -408,7 +408,7 @@ export default function BuyTicket() {
                 <p className="text-[11px] text-zinc-300 font-mono">
                   PromptPay / Mobile: <span className="font-bold text-amber-400">081-xxx-3302</span>
                 </p>
-                <p className="text-sm font-extrabold text-zinc-100 pt-0.5">Amount: 6.9 THB</p>
+                <p className="text-sm font-extrabold text-zinc-100 pt-0.5">Amount: 69 THB</p>
               </div>
             </div>
 
